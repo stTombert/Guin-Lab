@@ -12,8 +12,15 @@ public class UiCanvasScrene : MonoBehaviour
     {
         timerService = FindObjectOfType<TimerService>();
         gameEngineService = FindObjectOfType<GameEngineService>();
-        timerText = GameObject.Find("TimerText").GetComponent<Text>();
-        personalHighscoreText = GameObject.Find("PersonalBestText").GetComponent<Text>();
+        timerText = FindText("TimerText");
+        personalHighscoreText = FindText("PersonalBestText");
+
+        if (!timerService || !gameEngineService || !timerText || !personalHighscoreText) {
+            Debug.LogError("Missing dependencies, the timer UI stays disabled.", this);
+            enabled = false;
+            return;
+        }
+
         timerService.DisplayTime(personalHighscoreText, gameEngineService.getPersonalHighscore());
     }
 
@@ -23,5 +30,20 @@ public class UiCanvasScrene : MonoBehaviour
         if (timerService.isTimeEnabled) {
             timerService.DisplayTime(timerText, timerService.currentTime);
         }
+    }
+
+    private Text FindText(string objectName)
+    {
+        GameObject target = GameObject.Find(objectName);
+        if (!target) {
+            Debug.LogError($"GameObject '{objectName}' not found in the scene.", this);
+            return null;
+        }
+
+        Text text = target.GetComponent<Text>();
+        if (!text) {
+            Debug.LogError($"GameObject '{objectName}' has no {nameof(Text)} component.", target);
+        }
+        return text;
     }
 }

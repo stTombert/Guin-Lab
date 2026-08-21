@@ -7,7 +7,12 @@ public class Siegtrigger : MonoBehaviour
         string name = other.gameObject.name;
         string tag = other.gameObject.tag;
         if (name == "Spielfigur") {
-            FindObjectOfType<GameEngineService>().wonGame();
+            GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
+            if (!gameEngineService) {
+                Debug.LogError($"{nameof(GameEngineService)} not found in the scene, the win cannot be registered.", this);
+                return;
+            }
+            gameEngineService.wonGame();
         }
     }
 

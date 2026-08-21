@@ -11,17 +11,17 @@ public class Movement : MonoBehaviour
 
     void Start() {
         characterController = gameObject.GetComponent<CharacterController>();
+        if (!characterController) {
+            Debug.LogError($"No {nameof(CharacterController)} on this GameObject, movement stays disabled.", this);
+            enabled = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         Vector3 finalMovement = MoveChar() + ApplyGravity();
-        if (!characterController) {
-            Debug.Log("Der characterController ist nicht gesetzt");
-        } else {
-            characterController.Move(finalMovement * Time.deltaTime);
-        }
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
     Vector3 MoveChar() {
@@ -51,7 +51,12 @@ public class Movement : MonoBehaviour
 
     // Finally one method to end the game via the game manager
     private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
+        GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!gameEngineService) {
+            Debug.LogError($"{nameof(GameEngineService)} not found in the scene, the game cannot be ended.", this);
+            return;
+        }
+        gameEngineService.endGame();
     }
 
     private void OnControllerColliderHit() {
