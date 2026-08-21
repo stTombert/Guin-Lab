@@ -13,9 +13,30 @@ public class UiSuccess : MonoBehaviour
     {
         timerService = FindObjectOfType<TimerService>();
         gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!timerService || !gameEngineService) {
+            Debug.LogError($"{nameof(TimerService)} or {nameof(GameEngineService)} not found in the scene, the result times stay empty.", this);
+            return;
+        }
+
         currentTimeText = GetComponent<Text>();
-        timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
-        highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
+        if (!currentTimeText) {
+            Debug.LogError($"No {nameof(Text)} component on this GameObject, cannot show the final time.", this);
+        } else {
+            timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
+        }
+
+        GameObject highscoreObject = GameObject.Find("HighscoreText");
+        if (!highscoreObject) {
+            Debug.LogError("GameObject 'HighscoreText' not found in the scene.", this);
+            return;
+        }
+
+        highscoreText = highscoreObject.GetComponent<Text>();
+        if (!highscoreText) {
+            Debug.LogError($"GameObject 'HighscoreText' has no {nameof(Text)} component.", highscoreObject);
+            return;
+        }
+
         timerService.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
     }
 }
