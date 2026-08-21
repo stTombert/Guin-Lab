@@ -5,8 +5,12 @@ public class Movement : MonoBehaviour
     public float moveSpeed = 15;
     public float gravity;
 
+    // Falling below this height means the player left the level and the game is over.
+    public float fallDeathHeight = -10;
+
     private CharacterController characterController;
     private float currentGravity = 0;
+    private bool hasEnded = false;
 
 
     void Start() {
@@ -20,6 +24,11 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (transform.position.y < fallDeathHeight) {
+            endGame();
+            return;
+        }
+
         Vector3 finalMovement = MoveChar() + ApplyGravity();
         characterController.Move(finalMovement * Time.deltaTime);
     }
@@ -42,14 +51,20 @@ public class Movement : MonoBehaviour
         if (characterController.isGrounded && currentGravity > 1f) {
             currentGravity = 1f;
         }
-        // if (characterController.attachedRigidbody.position.y < -1) {
-        //     Services.GameEngine.endGame();
-        // }
 
         return gravityMovement;
     }
 
-    private void OnControllerColliderHit() {
-        // Debug.Log("Hier ist was passiert");
+    // Finally one method to end the game via the game manager
+    private void endGame() {
+        if (hasEnded) {
+            return;
+        }
+        hasEnded = true;
+
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the game cannot be ended");
+        if (gameEngineService) {
+            gameEngineService.endGame();
+        }
     }
 }
