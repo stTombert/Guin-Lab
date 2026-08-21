@@ -3,7 +3,6 @@ using UnityEngine.SceneManagement;
 
 public class GameEngineService : MonoBehaviour
 {
-    private const string HighscoreKey = "PersonalHighscore";
     private const string SuccessSceneName = "SuccessScrene";
 
     public string sceneName;
@@ -14,10 +13,7 @@ public class GameEngineService : MonoBehaviour
 
     void Start() {
         Debug.Log("Welcome to the game");
-        timerService = FindObjectOfType<TimerService>();
-        if (!timerService) {
-            Debug.LogError($"{nameof(TimerService)} not found in the scene, the timer and the highscore will not work.", this);
-        }
+        timerService = Services.Require<TimerService>(this, "the timer and the highscore will not work");
         personalHighscore = getPersonalHighscore();
         Debug.Log(personalHighscore);
     }
@@ -52,19 +48,17 @@ public class GameEngineService : MonoBehaviour
     }
 
     public void resetHighscore() {
-        PlayerPrefs.DeleteKey(HighscoreKey);
-        PlayerPrefs.Save();
+        GameStorage.ClearPersonalHighscore();
         personalHighscore = 0;
     }
 
     public float getPersonalHighscore() {
-        return PlayerPrefs.GetFloat(HighscoreKey, 0);
+        return GameStorage.PersonalHighscore;
     }
 
     public void setPersonalHighscore(float newHighscore) {
         if (personalHighscore > newHighscore || personalHighscore == 0) {
-            PlayerPrefs.SetFloat(HighscoreKey, newHighscore);
-            PlayerPrefs.Save();
+            GameStorage.PersonalHighscore = newHighscore;
             personalHighscore = newHighscore;
         }
     }

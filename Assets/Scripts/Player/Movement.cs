@@ -43,20 +43,10 @@ public class Movement : MonoBehaviour
             currentGravity = 1f;
         }
         // if (characterController.attachedRigidbody.position.y < -1) {
-        //     endGame();
+        //     Services.GameEngine.endGame();
         // }
 
         return gravityMovement;
-    }
-
-    // Finally one method to end the game via the game manager
-    private void endGame() {
-        GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
-        if (!gameEngineService) {
-            Debug.LogError($"{nameof(GameEngineService)} not found in the scene, the game cannot be ended.", this);
-            return;
-        }
-        gameEngineService.endGame();
     }
 
     private void OnControllerColliderHit() {
