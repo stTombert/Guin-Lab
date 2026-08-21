@@ -11,17 +11,17 @@ public class Movement : MonoBehaviour
 
     void Start() {
         characterController = gameObject.GetComponent<CharacterController>();
+        if (!characterController) {
+            Debug.LogError($"No {nameof(CharacterController)} on this GameObject, movement stays disabled.", this);
+            enabled = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         Vector3 finalMovement = MoveChar() + ApplyGravity();
-        if (!characterController) {
-            Debug.Log("Der characterController ist nicht gesetzt");
-        } else {
-            characterController.Move(finalMovement * Time.deltaTime);
-        }
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
     Vector3 MoveChar() {

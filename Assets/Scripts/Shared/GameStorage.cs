@@ -9,17 +9,24 @@ public static class GameStorage
     public static float PersonalHighscore
     {
         get { return PlayerPrefs.GetFloat(PersonalHighscoreKey, 0); }
-        set { PlayerPrefs.SetFloat(PersonalHighscoreKey, value); }
+        set { Save(PersonalHighscoreKey, value); }
     }
 
     public static float FinalTime
     {
         get { return PlayerPrefs.GetFloat(FinalTimeKey, 0); }
-        set { PlayerPrefs.SetFloat(FinalTimeKey, value); }
+        set { Save(FinalTimeKey, value); }
     }
 
     public static void ClearPersonalHighscore()
     {
         PlayerPrefs.DeleteKey(PersonalHighscoreKey);
+        PlayerPrefs.Save();
+    }
+
+    private static void Save(string key, float value)
+    {
+        PlayerPrefs.SetFloat(key, value);
+        PlayerPrefs.Save();
     }
 }

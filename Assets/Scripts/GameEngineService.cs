@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class GameEngineService : MonoBehaviour
 {
+    private const string SuccessSceneName = "SuccessScrene";
+
     public string sceneName;
     static GameObject RunningGameState;
     public string loadState;
@@ -11,7 +13,7 @@ public class GameEngineService : MonoBehaviour
 
     void Start() {
         Debug.Log("Welcome to the game");
-        timerService = Services.Timer;
+        timerService = Services.Require<TimerService>(this, "the timer and the highscore will not work");
         personalHighscore = getPersonalHighscore();
         Debug.Log(personalHighscore);
     }
@@ -21,7 +23,12 @@ public class GameEngineService : MonoBehaviour
 
     public void wonGame() {
         Debug.Log("Win");
-        
+
+        if (!timerService) {
+            Debug.LogError($"Cannot finish the run without a {nameof(TimerService)}.", this);
+            return;
+        }
+
         // 1. Stop timer
         timerService.stopTime();
         // 2. Set final time
@@ -29,7 +36,7 @@ public class GameEngineService : MonoBehaviour
         // 3. Set new Highscore, if possible
         setPersonalHighscore(timerService.getFinalTime());
         // 4. FInally Load Success Screne
-        SceneManager.LoadScene("SuccessScrene");
+        loadScene(SuccessSceneName);
     }
 
     public void goToScene()
@@ -37,11 +44,12 @@ public class GameEngineService : MonoBehaviour
         if (loadState == "currentGame") {
             Debug.Log("Load state");
         }
-        SceneManager.LoadScene(sceneName);
+        loadScene(sceneName);
     }
 
     public void resetHighscore() {
         GameStorage.ClearPersonalHighscore();
+        personalHighscore = 0;
     }
 
     public float getPersonalHighscore() {
@@ -51,7 +59,20 @@ public class GameEngineService : MonoBehaviour
     public void setPersonalHighscore(float newHighscore) {
         if (personalHighscore > newHighscore || personalHighscore == 0) {
             GameStorage.PersonalHighscore = newHighscore;
+            personalHighscore = newHighscore;
         }
+    }
+
+    private void loadScene(string targetSceneName) {
+        if (string.IsNullOrEmpty(targetSceneName)) {
+            Debug.LogError("No scene name configured, cannot load a scene.", this);
+            return;
+        }
+        if (!Application.CanStreamedLevelBeLoaded(targetSceneName)) {
+            Debug.LogError($"Scene '{targetSceneName}' is missing from the build settings, cannot load it.", this);
+            return;
+        }
+        SceneManager.LoadScene(targetSceneName);
     }
 
     public void quit() {

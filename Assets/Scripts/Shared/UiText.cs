@@ -7,19 +7,26 @@ public static class UiText
 {
     public const string TimeFormat = "mm\\:ss\\.fff";
 
-    public static Text Find(string gameObjectName)
+    // Returns null and logs an error when the GameObject or its Text component is missing.
+    public static Text Find(string gameObjectName, UnityEngine.Object context = null)
     {
         GameObject target = GameObject.Find(gameObjectName);
         if (!target) {
-            Debug.LogWarning("Es gibt kein GameObject mit dem Namen " + gameObjectName);
+            Debug.LogError($"GameObject '{gameObjectName}' not found in the scene.", context);
             return null;
         }
-        return target.GetComponent<Text>();
+
+        Text text = target.GetComponent<Text>();
+        if (!text) {
+            Debug.LogError($"GameObject '{gameObjectName}' has no {nameof(Text)} component.", target);
+        }
+        return text;
     }
 
     public static void DisplayTime(Text target, float timeToDisplay, string format = TimeFormat)
     {
         if (!target) {
+            Debug.LogError("No text target given, cannot display the time.");
             return;
         }
         target.text = TimeSpan.FromSeconds(timeToDisplay).ToString(format);

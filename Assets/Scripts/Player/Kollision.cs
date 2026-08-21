@@ -8,7 +8,10 @@ public class Kollision : MonoBehaviour
     private void OnCollisionEnter(Collision collisionInfo)
     {
         Debug.Log("Hier ist was passiert");
-        Services.GameEngine.endGame();
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the game cannot be ended");
+        if (gameEngineService) {
+            gameEngineService.endGame();
+        }
     }
 
     private void OnCollisionStay(Collision collisionInfo)
