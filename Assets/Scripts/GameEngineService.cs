@@ -21,7 +21,13 @@ public class GameEngineService : MonoBehaviour
 
     public void wonGame() {
         Debug.Log("Win");
-        
+
+        if (!timerService) {
+            Debug.LogWarning("Kein TimerService in der Szene gefunden");
+            SceneManager.LoadScene("SuccessScrene");
+            return;
+        }
+
         // 1. Stop timer
         timerService.stopTime();
         // 2. Set final time

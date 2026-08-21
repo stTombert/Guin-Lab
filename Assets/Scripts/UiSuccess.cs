@@ -13,9 +13,20 @@ public class UiSuccess : MonoBehaviour
     {
         timerService = FindObjectOfType<TimerService>();
         gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!timerService || !gameEngineService) {
+            Debug.LogWarning("TimerService oder GameEngineService fehlt in der Szene");
+            return;
+        }
+
         currentTimeText = GetComponent<Text>();
-        timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
-        highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
-        timerService.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
+        if (currentTimeText) {
+            timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
+        }
+
+        GameObject highscoreObject = GameObject.Find("HighscoreText");
+        highscoreText = highscoreObject ? highscoreObject.GetComponent<Text>() : null;
+        if (highscoreText) {
+            timerService.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
+        }
     }
 }

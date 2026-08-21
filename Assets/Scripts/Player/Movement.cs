@@ -39,7 +39,7 @@ public class Movement : MonoBehaviour
         Vector3 gravityMovement = new Vector3(0, -currentGravity, 0);
         currentGravity += gravity * Time.deltaTime;
 
-        if (characterController.isGrounded && currentGravity > 1f) {
+        if (characterController && characterController.isGrounded && currentGravity > 1f) {
             currentGravity = 1f;
         }
         // if (characterController.attachedRigidbody.position.y < -1) {
@@ -51,7 +51,12 @@ public class Movement : MonoBehaviour
 
     // Finally one method to end the game via the game manager
     private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
+        GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!gameEngineService) {
+            Debug.LogWarning("Kein GameEngineService in der Szene gefunden");
+            return;
+        }
+        gameEngineService.endGame();
     }
 
     private void OnControllerColliderHit() {

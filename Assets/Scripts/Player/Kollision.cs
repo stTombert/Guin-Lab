@@ -27,7 +27,12 @@ public class Kollision : MonoBehaviour
 
     // Finally one method to end the game via the game manager
     private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
+        GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!gameEngineService) {
+            Debug.LogWarning("Kein GameEngineService in der Szene gefunden");
+            return;
+        }
+        gameEngineService.endGame();
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)

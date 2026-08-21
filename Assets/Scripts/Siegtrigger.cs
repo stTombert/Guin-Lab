@@ -4,11 +4,16 @@ public class Siegtrigger : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        string name = other.gameObject.name;
-        string tag = other.gameObject.tag;
-        if (name == "Spielfigur") {
-            FindObjectOfType<GameEngineService>().wonGame();
+        if (other.gameObject.name != "Spielfigur") {
+            return;
         }
+
+        GameEngineService gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!gameEngineService) {
+            Debug.LogWarning("Kein GameEngineService in der Szene gefunden");
+            return;
+        }
+        gameEngineService.wonGame();
     }
 
     private void OnCollisionExit(Collision collisionInfo)
