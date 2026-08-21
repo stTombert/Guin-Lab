@@ -7,11 +7,13 @@ public class GameEngineService : MonoBehaviour
     static GameObject RunningGameState;
     public string loadState;
     public float personalHighscore;
-    private TimerService timerService;
+    public TimerService timerService;
 
     void Start() {
         Debug.Log("Welcome to the game");
-        timerService = FindObjectOfType<TimerService>();
+        if (timerService == null) {
+            timerService = FindObjectOfType<TimerService>();
+        }
         personalHighscore = getPersonalHighscore();
         Debug.Log(personalHighscore);
     }
@@ -21,15 +23,19 @@ public class GameEngineService : MonoBehaviour
 
     public void wonGame() {
         Debug.Log("Win");
-        
+
+        processWin();
+        // 4. FInally Load Success Screne
+        SceneManager.LoadScene("SuccessScrene");
+    }
+
+    public void processWin() {
         // 1. Stop timer
         timerService.stopTime();
         // 2. Set final time
         timerService.setFinalTime(timerService.currentTime);
         // 3. Set new Highscore, if possible
         setPersonalHighscore(timerService.getFinalTime());
-        // 4. FInally Load Success Screne
-        SceneManager.LoadScene("SuccessScrene");
     }
 
     public void goToScene()

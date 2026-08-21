@@ -14,11 +14,29 @@ public class UiCanvasScrene : MonoBehaviour
         gameEngineService = FindObjectOfType<GameEngineService>();
         timerText = GameObject.Find("TimerText").GetComponent<Text>();
         personalHighscoreText = GameObject.Find("PersonalBestText").GetComponent<Text>();
-        timerService.DisplayTime(personalHighscoreText, gameEngineService.getPersonalHighscore());
+        initialize(timerService, gameEngineService, timerText, personalHighscoreText);
     }
 
     // Update is called once per frame
     void Update()
+    {
+        refreshTimerText();
+    }
+
+    public void initialize(
+        TimerService resolvedTimerService,
+        GameEngineService resolvedGameEngineService,
+        Text resolvedTimerText,
+        Text resolvedPersonalHighscoreText)
+    {
+        timerService = resolvedTimerService;
+        gameEngineService = resolvedGameEngineService;
+        timerText = resolvedTimerText;
+        personalHighscoreText = resolvedPersonalHighscoreText;
+        timerService.DisplayTime(personalHighscoreText, gameEngineService.getPersonalHighscore());
+    }
+
+    public void refreshTimerText()
     {
         if (timerService.isTimeEnabled) {
             timerService.DisplayTime(timerText, timerService.currentTime);
