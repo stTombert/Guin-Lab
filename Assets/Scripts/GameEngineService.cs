@@ -4,9 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class GameEngineService : MonoBehaviour
 {
-    private const string PauseSceneName = "PauseMenu";
     private const string SuccessSceneName = "SuccessScrene";
-    private const string HighscoreKey = "PersonalHighscore";
+    private const string PauseSceneName = "PauseMenu";
 
     // Renders the pause menu above the canvases of the level it is loaded on top of.
     private const int PauseCanvasSortingOrder = 100;
@@ -16,7 +15,7 @@ public class GameEngineService : MonoBehaviour
     private TimerService timerService;
 
     void Start() {
-        timerService = FindObjectOfType<TimerService>();
+        timerService = Services.Require<TimerService>(this, "the timer and the highscore will not work");
         personalHighscore = getPersonalHighscore();
     }
 
@@ -27,22 +26,37 @@ public class GameEngineService : MonoBehaviour
             timerService.stopTime();
         }
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        loadScene(SceneManager.GetActiveScene().name);
     }
 
     public void wonGame() {
+        Debug.Log("Win");
+
+        if (!timerService) {
+            Debug.LogError($"Cannot finish the run without a {nameof(TimerService)}.", this);
+            return;
+        }
+
         Time.timeScale = 1f;
+        // 1. Stop timer
         timerService.stopTime();
+        // 2. Set final time
         float finalTime = timerService.currentTime;
         timerService.setFinalTime(finalTime);
+        // 3. Set new Highscore, if possible
         setPersonalHighscore(finalTime);
-        SceneManager.LoadScene(SuccessSceneName);
+        // 4. FInally Load Success Screne
+        loadScene(SuccessSceneName);
     }
 
     // Keeps the level alive underneath and freezes it, so resuming continues the run
     // instead of restarting it.
     public void pauseGame() {
         if (SceneManager.GetSceneByName(PauseSceneName).isLoaded) {
+            return;
+        }
+        if (!Application.CanStreamedLevelBeLoaded(PauseSceneName)) {
+            Debug.LogError($"Scene '{PauseSceneName}' is missing from the build settings, cannot pause.", this);
             return;
         }
         Time.timeScale = 0f;
@@ -60,31 +74,37 @@ public class GameEngineService : MonoBehaviour
 
     public void goToScene()
     {
-        if (string.IsNullOrEmpty(sceneName)) {
-            Debug.LogError("sceneName is not set on " + gameObject.name);
-            return;
-        }
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(sceneName);
+        loadScene(sceneName);
     }
 
     public void resetHighscore() {
-        PlayerPrefs.DeleteKey(HighscoreKey);
-        PlayerPrefs.Save();
+        GameStorage.ClearPersonalHighscore();
         personalHighscore = 0;
     }
 
     public float getPersonalHighscore() {
-        return PlayerPrefs.GetFloat(HighscoreKey, 0);
+        return GameStorage.PersonalHighscore;
     }
 
     public void setPersonalHighscore(float newHighscore) {
-        if (PlayerPrefs.HasKey(HighscoreKey) && PlayerPrefs.GetFloat(HighscoreKey) <= newHighscore) {
+        if (personalHighscore > newHighscore || personalHighscore == 0) {
+            GameStorage.PersonalHighscore = newHighscore;
+            personalHighscore = newHighscore;
+        }
+    }
+
+    private void loadScene(string targetSceneName) {
+        if (string.IsNullOrEmpty(targetSceneName)) {
+            Debug.LogError("No scene name configured, cannot load a scene.", this);
             return;
         }
-        PlayerPrefs.SetFloat(HighscoreKey, newHighscore);
-        PlayerPrefs.Save();
-        personalHighscore = newHighscore;
+        if (!Application.CanStreamedLevelBeLoaded(targetSceneName)) {
+            Debug.LogError($"Scene '{targetSceneName}' is missing from the build settings, cannot load it.", this);
+            return;
+        }
+        // A scene loaded while the game is paused would stay frozen.
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(targetSceneName);
     }
 
     public void quit() {

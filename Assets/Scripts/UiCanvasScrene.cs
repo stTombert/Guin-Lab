@@ -4,24 +4,30 @@ using UnityEngine.UI;
 public class UiCanvasScrene : MonoBehaviour
 {
     private Text timerText;
-    private Text personalHighscoreText;
     private TimerService timerService;
-    private GameEngineService gameEngineService;
+
     // Start is called before the first frame update
     void Start()
     {
-        timerService = FindObjectOfType<TimerService>();
-        gameEngineService = FindObjectOfType<GameEngineService>();
-        timerText = GameObject.Find("TimerText").GetComponent<Text>();
-        personalHighscoreText = GameObject.Find("PersonalBestText").GetComponent<Text>();
-        timerService.DisplayTime(personalHighscoreText, gameEngineService.getPersonalHighscore());
+        timerService = Services.Require<TimerService>(this, "the timer UI stays disabled");
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the timer UI stays disabled");
+        timerText = UiText.Find("TimerText", this);
+        Text personalHighscoreText = UiText.Find("PersonalBestText", this);
+
+        if (!timerService || !gameEngineService || !timerText || !personalHighscoreText) {
+            Debug.LogError("Missing dependencies, the timer UI stays disabled.", this);
+            enabled = false;
+            return;
+        }
+
+        UiText.DisplayTime(personalHighscoreText, gameEngineService.getPersonalHighscore());
     }
 
     // Update is called once per frame
     void Update()
     {
         if (timerService.isTimeEnabled) {
-            timerService.DisplayTime(timerText, timerService.currentTime);
+            UiText.DisplayTime(timerText, timerService.currentTime);
         }
     }
 }

@@ -3,19 +3,25 @@ using UnityEngine.UI;
 
 public class UiSuccess : MonoBehaviour
 {
-    private Text currentTimeText;
-    private Text highscoreText;
-    private TimerService timerService;
-    private GameEngineService gameEngineService;
-
     // Start is called before the first frame update
     void Start()
     {
-        timerService = FindObjectOfType<TimerService>();
-        gameEngineService = FindObjectOfType<GameEngineService>();
-        currentTimeText = GetComponent<Text>();
-        timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
-        highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
-        timerService.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
+        TimerService timerService = Services.Require<TimerService>(this, "the result times stay empty");
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the result times stay empty");
+        if (!timerService || !gameEngineService) {
+            return;
+        }
+
+        Text currentTimeText = GetComponent<Text>();
+        if (!currentTimeText) {
+            Debug.LogError($"No {nameof(Text)} component on this GameObject, cannot show the final time.", this);
+        } else {
+            UiText.DisplayTime(currentTimeText, timerService.getFinalTime());
+        }
+
+        Text highscoreText = UiText.Find("HighscoreText", this);
+        if (highscoreText) {
+            UiText.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
+        }
     }
 }

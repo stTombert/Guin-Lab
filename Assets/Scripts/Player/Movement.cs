@@ -9,24 +9,21 @@ public class Movement : MonoBehaviour
     public float fallDeathHeight = -10;
 
     private CharacterController characterController;
-    private GameEngineService gameEngineService;
     private float currentGravity = 0;
     private bool hasEnded = false;
 
 
     void Start() {
         characterController = gameObject.GetComponent<CharacterController>();
-        gameEngineService = FindObjectOfType<GameEngineService>();
+        if (!characterController) {
+            Debug.LogError($"No {nameof(CharacterController)} on this GameObject, movement stays disabled.", this);
+            enabled = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!characterController) {
-            Debug.Log("Der characterController ist nicht gesetzt");
-            return;
-        }
-
         if (transform.position.y < fallDeathHeight) {
             endGame();
             return;
@@ -64,10 +61,10 @@ public class Movement : MonoBehaviour
             return;
         }
         hasEnded = true;
-        if (!gameEngineService) {
-            Debug.LogError("No GameEngineService in the scene, the game cannot be ended");
-            return;
+
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the game cannot be ended");
+        if (gameEngineService) {
+            gameEngineService.endGame();
         }
-        gameEngineService.endGame();
     }
 }
