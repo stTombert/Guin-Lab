@@ -8,7 +8,7 @@ public class Kollision : MonoBehaviour
     private void OnCollisionEnter(Collision collisionInfo)
     {
         Debug.Log("Hier ist was passiert");
-        endGame();
+        Services.GameEngine.endGame();
     }
 
     private void OnCollisionStay(Collision collisionInfo)
@@ -23,11 +23,6 @@ public class Kollision : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-    }
-
-    // Finally one method to end the game via the game manager
-    private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)

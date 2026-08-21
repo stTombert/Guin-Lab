@@ -7,7 +7,7 @@ public class Siegtrigger : MonoBehaviour
         string name = other.gameObject.name;
         string tag = other.gameObject.tag;
         if (name == "Spielfigur") {
-            FindObjectOfType<GameEngineService>().wonGame();
+            Services.GameEngine.wonGame();
         }
     }
 
