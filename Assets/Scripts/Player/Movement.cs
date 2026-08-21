@@ -5,23 +5,35 @@ public class Movement : MonoBehaviour
     public float moveSpeed = 15;
     public float gravity;
 
+    // Falling below this height means the player left the level and the game is over.
+    public float fallDeathHeight = -10;
+
     private CharacterController characterController;
+    private GameEngineService gameEngineService;
     private float currentGravity = 0;
+    private bool hasEnded = false;
 
 
     void Start() {
         characterController = gameObject.GetComponent<CharacterController>();
+        gameEngineService = FindObjectOfType<GameEngineService>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 finalMovement = MoveChar() + ApplyGravity();
         if (!characterController) {
             Debug.Log("Der characterController ist nicht gesetzt");
-        } else {
-            characterController.Move(finalMovement * Time.deltaTime);
+            return;
         }
+
+        if (transform.position.y < fallDeathHeight) {
+            endGame();
+            return;
+        }
+
+        Vector3 finalMovement = MoveChar() + ApplyGravity();
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
     Vector3 MoveChar() {
@@ -42,19 +54,20 @@ public class Movement : MonoBehaviour
         if (characterController.isGrounded && currentGravity > 1f) {
             currentGravity = 1f;
         }
-        // if (characterController.attachedRigidbody.position.y < -1) {
-        //     endGame();
-        // }
 
         return gravityMovement;
     }
 
     // Finally one method to end the game via the game manager
     private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
-    }
-
-    private void OnControllerColliderHit() {
-        // Debug.Log("Hier ist was passiert");
+        if (hasEnded) {
+            return;
+        }
+        hasEnded = true;
+        if (!gameEngineService) {
+            Debug.LogError("No GameEngineService in the scene, the game cannot be ended");
+            return;
+        }
+        gameEngineService.endGame();
     }
 }

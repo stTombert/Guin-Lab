@@ -367,7 +367,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: Level01
-  loadState: 
   personalHighscore: 0
 --- !u!114 &491434769
 MonoBehaviour:
@@ -1176,7 +1175,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: Level01
-  loadState: currentGame
   personalHighscore: 0
 --- !u!114 &1803533640
 MonoBehaviour:
@@ -1222,7 +1220,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1803533639}
-        m_MethodName: goToScene
+        m_MethodName: resumeGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1322,7 +1320,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: MainMenu
-  loadState: 
   personalHighscore: 0
 --- !u!114 &2012291318
 MonoBehaviour:
