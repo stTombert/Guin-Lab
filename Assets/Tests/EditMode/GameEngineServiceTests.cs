@@ -5,6 +5,7 @@ public class GameEngineServiceTests
 {
     private GameObject gameEngineGameObject;
     private GameEngineService gameEngineService;
+    private GameObject timerGameObject;
 
     [SetUp]
     public void SetUp()
@@ -19,6 +20,10 @@ public class GameEngineServiceTests
     [TearDown]
     public void TearDown()
     {
+        if (timerGameObject != null)
+        {
+            Object.DestroyImmediate(timerGameObject);
+        }
         Object.DestroyImmediate(gameEngineGameObject);
 
         PlayerPrefs.DeleteKey("PersonalHighscore");
@@ -69,5 +74,22 @@ public class GameEngineServiceTests
         gameEngineService.resetHighscore();
 
         Assert.AreEqual(0f, gameEngineService.getPersonalHighscore());
+    }
+
+    [Test]
+    public void ProcessWinStopsTimerPersistsFinalTimeAndUpdatesHighscore()
+    {
+        timerGameObject = new GameObject("TimerService");
+        TimerService timerService = timerGameObject.AddComponent<TimerService>();
+        timerService.startTime();
+        timerService.currentTime = 42f;
+        gameEngineService.personalHighscore = 50f;
+        gameEngineService.timerService = timerService;
+
+        gameEngineService.processWin();
+
+        Assert.IsFalse(timerService.isTimeEnabled);
+        Assert.AreEqual(42f, timerService.getFinalTime());
+        Assert.AreEqual(42f, gameEngineService.getPersonalHighscore());
     }
 }

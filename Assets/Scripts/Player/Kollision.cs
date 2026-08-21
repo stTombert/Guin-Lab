@@ -5,6 +5,7 @@ using UnityEngine;
 public class Kollision : MonoBehaviour
 {
     public Movement playerMovement;
+    public GameEngineService gameEngineService;
     private void OnCollisionEnter(Collision collisionInfo)
     {
         Debug.Log("Hier ist was passiert");
@@ -26,8 +27,12 @@ public class Kollision : MonoBehaviour
     }
 
     // Finally one method to end the game via the game manager
-    private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
+    public void endGame() {
+        GameEngineService service = gameEngineService;
+        if (service == null) {
+            service = FindObjectOfType<GameEngineService>();
+        }
+        service.endGame();
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)

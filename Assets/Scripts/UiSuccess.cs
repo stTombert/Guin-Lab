@@ -14,8 +14,21 @@ public class UiSuccess : MonoBehaviour
         timerService = FindObjectOfType<TimerService>();
         gameEngineService = FindObjectOfType<GameEngineService>();
         currentTimeText = GetComponent<Text>();
-        timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
         highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
+        initialize(timerService, gameEngineService, currentTimeText, highscoreText);
+    }
+
+    public void initialize(
+        TimerService resolvedTimerService,
+        GameEngineService resolvedGameEngineService,
+        Text resolvedCurrentTimeText,
+        Text resolvedHighscoreText)
+    {
+        timerService = resolvedTimerService;
+        gameEngineService = resolvedGameEngineService;
+        currentTimeText = resolvedCurrentTimeText;
+        highscoreText = resolvedHighscoreText;
+        timerService.DisplayTime(currentTimeText, timerService.getFinalTime());
         timerService.DisplayTime(highscoreText, gameEngineService.getPersonalHighscore());
     }
 }

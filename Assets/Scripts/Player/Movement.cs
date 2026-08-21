@@ -16,7 +16,7 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 finalMovement = MoveChar() + ApplyGravity();
+        Vector3 finalMovement = MoveChar(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")) + ApplyGravity(characterController.isGrounded, Time.deltaTime);
         if (!characterController) {
             Debug.Log("Der characterController ist nicht gesetzt");
         } else {
@@ -24,22 +24,22 @@ public class Movement : MonoBehaviour
         }
     }
 
-    Vector3 MoveChar() {
+    public Vector3 MoveChar(float vertical, float horizontal) {
         Vector3 moveVector = Vector3.zero;
 
-        moveVector += transform.forward * Input.GetAxis("Vertical");
-        moveVector += transform.right * Input.GetAxis("Horizontal");
+        moveVector += transform.forward * vertical;
+        moveVector += transform.right * horizontal;
 
         moveVector *= moveSpeed;
 
         return moveVector;
     }
 
-    Vector3 ApplyGravity() {
+    public Vector3 ApplyGravity(bool isGrounded, float deltaTime) {
         Vector3 gravityMovement = new Vector3(0, -currentGravity, 0);
-        currentGravity += gravity * Time.deltaTime;
+        currentGravity += gravity * deltaTime;
 
-        if (characterController.isGrounded && currentGravity > 1f) {
+        if (isGrounded && currentGravity > 1f) {
             currentGravity = 1f;
         }
         // if (characterController.attachedRigidbody.position.y < -1) {
