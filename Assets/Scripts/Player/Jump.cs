@@ -9,11 +9,16 @@ public class Jump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButton("Jump")) {
-            jump = 20* Time.deltaTime;
-        } else {
-            jump = 0;
-        }
+        jump = calculateJump(Input.GetButton("Jump"), Time.deltaTime);
         transform.Translate(0, jump, 0);
+    }
+
+    public float calculateJump(bool isJumpPressed, float deltaTime)
+    {
+        if (isJumpPressed) {
+            return 20 * deltaTime;
+        } else {
+            return 0;
+        }
     }
 }

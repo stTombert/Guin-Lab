@@ -39,6 +39,7 @@ public class GameEngineServiceTests
         gameEngineService.setPersonalHighscore(42f);
 
         Assert.AreEqual(42f, gameEngineService.getPersonalHighscore());
+        Assert.AreEqual(42f, gameEngineService.personalHighscore);
     }
 
     [Test]
@@ -49,6 +50,7 @@ public class GameEngineServiceTests
         gameEngineService.setPersonalHighscore(75f);
 
         Assert.AreEqual(75f, gameEngineService.getPersonalHighscore());
+        Assert.AreEqual(75f, gameEngineService.personalHighscore);
     }
 
     [Test]
@@ -69,5 +71,6 @@ public class GameEngineServiceTests
         gameEngineService.resetHighscore();
 
         Assert.AreEqual(0f, gameEngineService.getPersonalHighscore());
+        Assert.AreEqual(0f, gameEngineService.personalHighscore);
     }
 }
