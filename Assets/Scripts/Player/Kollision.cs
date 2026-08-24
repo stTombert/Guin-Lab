@@ -20,7 +20,7 @@ public class Kollision : MonoBehaviour
         }
     }
 
-    private bool isDeadly(GameObject other) {
+    public bool isDeadly(GameObject other) {
         return (deadlyLayers.value & (1 << other.layer)) != 0;
     }
 }

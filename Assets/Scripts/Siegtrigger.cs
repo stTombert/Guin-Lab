@@ -6,12 +6,17 @@ public class Siegtrigger : MonoBehaviour
     {
         string name = other.gameObject.name;
         string tag = other.gameObject.tag;
-        if (name == "Spielfigur") {
+        if (isPlayer(name)) {
             GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the win cannot be registered");
             if (gameEngineService) {
                 gameEngineService.wonGame();
             }
         }
+    }
+
+    public bool isPlayer(string objectName)
+    {
+        return objectName == "Spielfigur";
     }
 
     private void OnCollisionExit(Collision collisionInfo)
