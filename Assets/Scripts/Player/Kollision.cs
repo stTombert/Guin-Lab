@@ -1,39 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Kollision : MonoBehaviour
 {
     public Movement playerMovement;
+
+    // Only collisions with these layers are deadly. Ground and walls have to stay out of the
+    // mask, otherwise simply standing on the floor ends the game.
+    public LayerMask deadlyLayers;
+
     private void OnCollisionEnter(Collision collisionInfo)
     {
-        Debug.Log("Hier ist was passiert");
-        endGame();
+        if (!isDeadly(collisionInfo.gameObject)) {
+            return;
+        }
+
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the game cannot be ended");
+        if (gameEngineService) {
+            gameEngineService.endGame();
+        }
     }
 
-    private void OnCollisionStay(Collision collisionInfo)
-    {
-        
-    }
-
-    private void OnCollisionExit(Collision collisionInfo)
-    {
-        
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-    }
-
-    // Finally one method to end the game via the game manager
-    private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
-    }
-
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        Debug.Log("Gewonnen hit");
-        Debug.Log(hit);
-        
+    private bool isDeadly(GameObject other) {
+        return (deadlyLayers.value & (1 << other.layer)) != 0;
     }
 }

@@ -5,23 +5,32 @@ public class Movement : MonoBehaviour
     public float moveSpeed = 15;
     public float gravity;
 
+    // Falling below this height means the player left the level and the game is over.
+    public float fallDeathHeight = -10;
+
     private CharacterController characterController;
     private float currentGravity = 0;
+    private bool hasEnded = false;
 
 
     void Start() {
         characterController = gameObject.GetComponent<CharacterController>();
+        if (!characterController) {
+            Debug.LogError($"No {nameof(CharacterController)} on this GameObject, movement stays disabled.", this);
+            enabled = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 finalMovement = MoveChar() + ApplyGravity();
-        if (!characterController) {
-            Debug.Log("Der characterController ist nicht gesetzt");
-        } else {
-            characterController.Move(finalMovement * Time.deltaTime);
+        if (transform.position.y < fallDeathHeight) {
+            endGame();
+            return;
         }
+
+        Vector3 finalMovement = MoveChar() + ApplyGravity();
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
     Vector3 MoveChar() {
@@ -42,19 +51,20 @@ public class Movement : MonoBehaviour
         if (characterController.isGrounded && currentGravity > 1f) {
             currentGravity = 1f;
         }
-        // if (characterController.attachedRigidbody.position.y < -1) {
-        //     endGame();
-        // }
 
         return gravityMovement;
     }
 
     // Finally one method to end the game via the game manager
     private void endGame() {
-        FindObjectOfType<GameEngineService>().endGame();
-    }
+        if (hasEnded) {
+            return;
+        }
+        hasEnded = true;
 
-    private void OnControllerColliderHit() {
-        // Debug.Log("Hier ist was passiert");
+        GameEngineService gameEngineService = Services.Require<GameEngineService>(this, "the game cannot be ended");
+        if (gameEngineService) {
+            gameEngineService.endGame();
+        }
     }
 }
